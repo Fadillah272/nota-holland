@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #09090b;
+    --foreground: #f4f4f5;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* ===================================================
+   CSS KHUSUS CETAK STRUK THERMAL (@media print)
+   =================================================== */
+@media print {
+  /* Sembunyikan elemen UI seperti navbar, formulir, tombol, petunjuk */
+  .no-print,
+  nav,
+  header,
+  footer:not(#thermal-receipt footer),
+  button,
+  input,
+  textarea {
+    display: none !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #thermal-receipt,
+  #thermal-receipt * {
+    visibility: visible;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 100% !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  #thermal-receipt {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    font-family: "Courier New", Courier, "Roboto Mono", monospace !important;
+  }
+
+  /* Lebar cetak presisi untuk kertas 58mm (area cetak efektif ~48mm) */
+  #thermal-receipt.paper-58mm {
+    width: 48mm !important;
+    max-width: 48mm !important;
+    padding: 1.5mm !important;
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+  }
+
+  /* Lebar cetak presisi untuk kertas 80mm (area cetak efektif ~72mm) */
+  #thermal-receipt.paper-80mm {
+    width: 72mm !important;
+    max-width: 72mm !important;
+    padding: 3mm !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Pastikan nama barang selalu membungkus baris baru dan tidak terpotong */
+  .item-row {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Garis pemisah thermal */
+  .receipt-dash {
+    letter-spacing: -1px !important;
+  }
+}

@@ -1,0 +1,113 @@
+import { ReceiptData } from '@/types/receipt';
+
+export const DEFAULT_RECEIPT_DATA: ReceiptData = {
+  header: {
+    storeName: 'HOLLAND BAKERY CILEGON',
+    address: 'Jln. Ahmad Yani no.12C&12D Sukmaj',
+    phone: 'Telp.0254-390732 WA.085178493493',
+    cashier: 'BENING',
+    machine: 'U04',
+    receiptNo: 'SL20261025-00211',
+    dateTime: '2026-10-25T16:51:02',
+    showLogo: true,
+    logoType: 'default',
+    customLogoUrl: null,
+  },
+  items: [
+    {
+      id: 'item-1',
+      code: '2004',
+      name: 'Chocolate John',
+      price: 12100,
+      qty: 1,
+    },
+    {
+      id: 'item-2',
+      code: '2005',
+      name: 'Cheese John',
+      price: 13800,
+      qty: 1,
+    },
+    {
+      id: 'item-3',
+      code: '6277',
+      name: 'Soft Cheese Cake',
+      price: 10300,
+      qty: 1,
+    },
+    {
+      id: 'item-4',
+      code: '4121',
+      name: 'Danish Coklat Belepotan',
+      price: 19500,
+      qty: 1,
+    },
+    {
+      id: 'item-5',
+      code: '3163',
+      name: 'Soes Cream Keju',
+      price: 14700,
+      qty: 1,
+    },
+    {
+      id: 'item-6',
+      code: '1553',
+      name: 'Singapore Kaya Toast',
+      price: 17900,
+      qty: 2,
+    },
+    {
+      id: 'item-7',
+      code: '1274',
+      name: 'Paperbag Sedang',
+      price: 0,
+      qty: 1,
+    },
+  ],
+  payment: {
+    method: 'QRIS',
+    includeTax: true,
+    taxPercent: 11,
+    cashReceived: 110000,
+    voucher: 'No Voucher',
+    footerText: 'Terima kasih atas kunjungan Anda\nBarang yang sudah dibeli tidak dapat ditukar/dikembalikan',
+    showQrCode: true,
+    qrCodeText: 'SL20261025-00211',
+  },
+  paperWidth: '58mm',
+};
+
+export const EMPTY_RECEIPT_DATA: ReceiptData = {
+  header: {
+    storeName: 'NAMA TOKO BAKERY',
+    address: 'Jl. Contoh Alamat No. 123',
+    phone: 'Telp. 0812-3456-7890',
+    cashier: 'KASIR 1',
+    machine: 'M01',
+    receiptNo: 'STRUK-001',
+    dateTime: new Date().toISOString().slice(0, 19),
+    showLogo: true,
+    logoType: 'default',
+    customLogoUrl: null,
+  },
+  items: [
+    {
+      id: 'item-new-1',
+      code: '',
+      name: '',
+      price: 0,
+      qty: 1,
+    },
+  ],
+  payment: {
+    method: 'Tunai',
+    includeTax: true,
+    taxPercent: 11,
+    cashReceived: 0,
+    voucher: 'No Voucher',
+    footerText: 'Terima kasih atas kunjungan Anda',
+    showQrCode: true,
+    qrCodeText: 'STRUK-001',
+  },
+  paperWidth: '58mm',
+};
