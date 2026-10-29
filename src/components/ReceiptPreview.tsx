@@ -45,13 +45,13 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
         </button>
       </div>
 
-      {/* Dynamic @page CSS rule for exact thermal paper width */}
+      {/* Dynamic @page CSS rule for thermal paper */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
             @page {
-              size: ${paperWidth} auto;
-              margin: 0;
+              size: auto;
+              margin: 0mm;
             }
           `,
         }}
@@ -107,9 +107,7 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
         </div>
 
         {/* 3. GARIS PEMISAH */}
-        <div className="receipt-dash my-1.5 overflow-hidden text-center select-none text-[10px] opacity-70">
-          --------------------------------------------------
-        </div>
+        <div className="receipt-dash-line my-1.5 border-b border-dashed border-black/70 w-full" />
 
         {/* 4. INFO KASIR & STRUK */}
         <div className="text-[10.5px] sm:text-[11px] space-y-0.5">
@@ -132,9 +130,7 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
         </div>
 
         {/* 5. GARIS PEMISAH */}
-        <div className="receipt-dash my-1.5 overflow-hidden text-center select-none text-[10px] opacity-70">
-          --------------------------------------------------
-        </div>
+        <div className="receipt-dash-line my-1.5 border-b border-dashed border-black/70 w-full" />
 
         {/* 6. DAFTAR BARANG (2 BARIS PER BARIS BARANG) */}
         <div className="space-y-1.5 my-1">
@@ -166,9 +162,7 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
         </div>
 
         {/* 7. GARIS PEMISAH */}
-        <div className="receipt-dash my-1.5 overflow-hidden text-center select-none text-[10px] opacity-70">
-          --------------------------------------------------
-        </div>
+        <div className="receipt-dash-line my-1.5 border-b border-dashed border-black/70 w-full" />
 
         {/* 8. TOTAL ITEM */}
         <div className="flex justify-between items-center py-0.5 text-[11px]">
@@ -246,18 +240,24 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
       </div>
 
       {/* Petunjuk Cetak Thermal */}
-      <div className="mt-4 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 text-xs text-amber-900 dark:text-amber-200 max-w-[420px] w-full no-print">
-        <p className="font-semibold mb-1">💡 Petunjuk Cetak Printer Struk Thermal:</p>
-        <ul className="list-disc list-inside space-y-0.5 text-[11px] opacity-90">
-          <li>Pilih printer struk thermal Anda pada dialog browser.</li>
-          <li>Atur <strong>Margin</strong> ke <strong>None / Tidak Ada</strong>.</li>
+      <div className="mt-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 text-xs text-amber-950 dark:text-amber-200 max-w-[420px] w-full no-print shadow-xs">
+        <div className="flex items-center gap-2 font-bold text-amber-900 dark:text-amber-300 mb-2">
+          <span>⚠️ Setelan Dialog Cetak Agar Tidak Mengecil / Tulisan Ant:</span>
+        </div>
+        <ol className="list-decimal list-inside space-y-1.5 text-[11px] leading-relaxed">
           <li>
-            Nonaktifkan opsi <strong>Headers and Footers</strong> (Header & Footer browser).
+            <strong>Ukuran Kertas (Paper size)</strong>: Klik <em>Setelan lainnya (More settings)</em>, ubah dari <strong>A4</strong> ke ukuran <strong>58mm</strong> (atau <em>58 x 210 mm / Roll Paper 58mm</em>). <span className="text-red-600 dark:text-red-400 font-semibold">(PENTING: Jangan biarkan A4!)</span>
           </li>
           <li>
-            Pastikan ukuran kertas sesuai (58mm atau 80mm).
+            <strong>Skala (Scale)</strong>: Pilih <strong>Default</strong> atau <strong>100%</strong> (jangan pilih &quot;Sesuaikan dengan area cetak&quot;).
           </li>
-        </ul>
+          <li>
+            <strong>Margin</strong>: Pilih <strong>None / Tidak Ada</strong> (jangan default).
+          </li>
+          <li>
+            <strong>Header & Footer</strong>: <strong>Hilangkan centang</strong> agar tanggal &amp; link URL browser tidak ikut tercetak.
+          </li>
+        </ol>
       </div>
     </div>
   );

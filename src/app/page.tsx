@@ -114,8 +114,8 @@ export default function HomePage() {
           </div>
 
           {/* Kolom Kanan: Preview Struk Live & Tombol Cetak (Lebar 5 dari 12 kolom pada desktop) */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24">
-            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/60 p-4 sm:p-6 backdrop-blur-xs shadow-xs flex flex-col items-center">
+          <div className="lg:col-span-5 lg:sticky lg:top-24 preview-wrapper">
+            <div className="preview-card rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/60 p-4 sm:p-6 backdrop-blur-xs shadow-xs flex flex-col items-center">
               <div className="w-full text-center pb-3 mb-4 border-b border-zinc-100 dark:border-zinc-800 no-print">
                 <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                   Pratinjau Struk Kasir
