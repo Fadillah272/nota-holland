@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { toPng } from 'html-to-image';
 import { ReceiptData } from '@/types/receipt';
 import { CalculationResult } from '@/utils/calculations';
 import { formatRupiah, formatReceiptDate } from '@/utils/formatters';
 import { QRCodeView } from './QRCodeView';
-import { WindmillLogo, PrinterIcon } from './Icons';
+import { WindmillLogo, PrinterIcon, DownloadIcon } from './Icons';
 
 interface ReceiptPreviewProps {
   data: ReceiptData;
@@ -20,6 +21,7 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
 }) => {
   const { header, items, payment, paperWidth } = data;
   const is58mm = paperWidth === '58mm';
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Filter items: only display those that have a non-empty name
   const validItems = items.filter((item) => item.name && item.name.trim() !== '');
@@ -27,30 +29,74 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
   // Formatted date
   const displayDate = formatReceiptDate(header.dateTime);
 
+  // Handler untuk mengunduh struk langsung sebagai gambar PNG jernih
+  const handleDownloadImage = async () => {
+    const el = document.getElementById('thermal-receipt');
+    if (!el) return;
+
+    try {
+      setIsDownloading(true);
+      const dataUrl = await toPng(el, {
+        quality: 1,
+        pixelRatio: 3, // Resolusi tinggi (300 DPI) agar teks dan QR code sangat tajam
+        backgroundColor: '#ffffff',
+      });
+
+      const safeName = (header.receiptNo || 'struk-holland')
+        .replace(/[^a-zA-Z0-9_-]/g, '_');
+      const link = document.createElement('a');
+      link.download = `${safeName}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Gagal mengunduh gambar struk:', err);
+      alert('Terjadi kesalahan saat mengunduh gambar. Silakan coba lagi.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center w-full">
-      {/* Tombol Cetak di Atas Preview (khusus layar) */}
-      <div className="w-full flex items-center justify-between gap-3 mb-4 no-print">
+      {/* Tombol Cetak & Unduh di Atas Preview (khusus layar) */}
+      <div className="w-full flex flex-wrap items-center justify-between gap-2.5 mb-4 no-print">
         <div className="text-xs text-zinc-500 dark:text-zinc-400">
-          Mode Kertas: <strong className="text-zinc-800 dark:text-zinc-200">{paperWidth}</strong>
+          Format: <strong className="text-zinc-800 dark:text-zinc-200">{paperWidth}</strong>
         </div>
-        <button
-          type="button"
-          onClick={onPrint}
-          id="btn-print-receipt"
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition cursor-pointer"
-        >
-          <PrinterIcon size={18} />
-          <span>Cetak Struk Sekarang</span>
-        </button>
+
+        <div className="flex items-center gap-2">
+          {/* Tombol Unduh Gambar PNG */}
+          <button
+            type="button"
+            onClick={handleDownloadImage}
+            disabled={isDownloading}
+            id="btn-download-image"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white font-semibold text-xs shadow-sm hover:shadow transition cursor-pointer"
+            title="Unduh struk sebagai gambar PNG jernih (tanpa perlu printer)"
+          >
+            <DownloadIcon size={16} />
+            <span>{isDownloading ? 'Menyimpan...' : 'Unduh Gambar (PNG)'}</span>
+          </button>
+
+          {/* Tombol Cetak / PDF */}
+          <button
+            type="button"
+            onClick={onPrint}
+            id="btn-print-receipt"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs shadow-sm hover:shadow transition cursor-pointer"
+          >
+            <PrinterIcon size={16} />
+            <span>Cetak / Simpan PDF</span>
+          </button>
+        </div>
       </div>
 
-      {/* Dynamic @page CSS rule for thermal paper */}
+      {/* Aturan CSS @page untuk PDF & Printer: Ukuran pas roll thermal 58mm / 80mm */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
             @page {
-              size: auto;
+              size: ${is58mm ? '58mm 210mm' : '80mm 297mm'};
               margin: 0mm;
             }
           `,
@@ -239,25 +285,31 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
         )}
       </div>
 
-      {/* Petunjuk Cetak Thermal */}
+      {/* Petunjuk Cetak & Simpan */}
       <div className="mt-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 text-xs text-amber-950 dark:text-amber-200 max-w-[420px] w-full no-print shadow-xs">
         <div className="flex items-center gap-2 font-bold text-amber-900 dark:text-amber-300 mb-2">
-          <span>⚠️ Setelan Dialog Cetak Agar Tidak Mengecil / Tulisan Ant:</span>
+          <span>💡 Tips untuk Anda (Dengan / Tanpa Printer Fisik):</span>
         </div>
-        <ol className="list-decimal list-inside space-y-1.5 text-[11px] leading-relaxed">
-          <li>
-            <strong>Ukuran Kertas (Paper size)</strong>: Klik <em>Setelan lainnya (More settings)</em>, ubah dari <strong>A4</strong> ke ukuran <strong>58mm</strong> (atau <em>58 x 210 mm / Roll Paper 58mm</em>). <span className="text-red-600 dark:text-red-400 font-semibold">(PENTING: Jangan biarkan A4!)</span>
+        <ul className="space-y-2 text-[11px] leading-relaxed">
+          <li className="flex items-start gap-2">
+            <span className="font-bold text-blue-600 dark:text-blue-400">1.</span>
+            <span>
+              <strong>Tanpa Printer Fisik?</strong> Klik tombol biru <strong>&quot;Unduh Gambar (PNG)&quot;</strong> di atas. Anda akan mendapatkan file gambar struk resolusi tinggi yang pas, jernih, dan siap dikirim via WhatsApp atau dicetak via aplikasi HP.
+            </span>
           </li>
-          <li>
-            <strong>Skala (Scale)</strong>: Pilih <strong>Default</strong> atau <strong>100%</strong> (jangan pilih &quot;Sesuaikan dengan area cetak&quot;).
+          <li className="flex items-start gap-2">
+            <span className="font-bold text-emerald-600 dark:text-emerald-400">2.</span>
+            <span>
+              <strong>Simpan ke PDF (Save as PDF)</strong>: Halaman PDF sekarang otomatis disesuaikan ke ukuran roll thermal ({paperWidth} roll), bukan A4 raksasa. Pastikan <strong>Margins: None</strong> dan <strong>Scale: Default / 100%</strong>.
+            </span>
           </li>
-          <li>
-            <strong>Margin</strong>: Pilih <strong>None / Tidak Ada</strong> (jangan default).
+          <li className="flex items-start gap-2">
+            <span className="font-bold text-amber-600 dark:text-amber-400">3.</span>
+            <span>
+              <strong>Jika mencetak ke Printer Thermal fisik</strong>: Pastikan pada dialog printer memilih ukuran kertas <strong>58mm</strong> (bukan A4) agar teks tidak diciutkan.
+            </span>
           </li>
-          <li>
-            <strong>Header & Footer</strong>: <strong>Hilangkan centang</strong> agar tanggal &amp; link URL browser tidak ikut tercetak.
-          </li>
-        </ol>
+        </ul>
       </div>
     </div>
   );
