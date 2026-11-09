@@ -12,6 +12,8 @@ export const DEFAULT_RECEIPT_DATA: ReceiptData = {
     showLogo: true,
     logoType: 'default',
     customLogoUrl: null,
+    logoWidth: 60,
+    logoHeight: 60,
   },
   items: [
     {
@@ -89,6 +91,8 @@ export const EMPTY_RECEIPT_DATA: ReceiptData = {
     showLogo: true,
     logoType: 'default',
     customLogoUrl: null,
+    logoWidth: 60,
+    logoHeight: 60,
   },
   items: [
     {

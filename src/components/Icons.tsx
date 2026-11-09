@@ -1,17 +1,28 @@
 import React from 'react';
 
-export const WindmillLogo: React.FC<{ className?: string; size?: number }> = ({
+export const WindmillLogo: React.FC<{
+  className?: string;
+  size?: number;
+  width?: number;
+  height?: number;
+}> = ({
   className = '',
-  size = 64,
-}) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 100 110"
-    fill="currentColor"
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  size,
+  width,
+  height,
+}) => {
+  const w = width ?? size ?? 60;
+  const h = height ?? size ?? 60;
+
+  return (
+    <svg
+      width={w}
+      height={h}
+      viewBox="0 0 100 110"
+      fill="currentColor"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
     {/* Windmill blades/sails with iconic bakery branch-leaf pattern */}
     <g transform="translate(50, 42)">
       {/* Center hub */}
@@ -89,6 +100,7 @@ export const WindmillLogo: React.FC<{ className?: string; size?: number }> = ({
     <rect x="28" y="94" width="44" height="3" rx="1.5" fill="black" />
   </svg>
 );
+};
 
 export const PrinterIcon: React.FC<{ className?: string; size?: number }> = ({
   className = '',

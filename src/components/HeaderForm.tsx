@@ -80,11 +80,32 @@ export const HeaderForm: React.FC<HeaderFormProps> = ({ header, onChange }) => {
         ctx.putImageData(imgData, 0, 0);
 
         const processedUrl = canvas.toDataURL('image/png');
-        onChange((prev) => ({
-          ...prev,
-          logoType: 'custom',
-          customLogoUrl: processedUrl,
-        }));
+        onChange((prev) => {
+          let newW = prev.logoWidth ?? 60;
+          let newH = prev.logoHeight ?? 60;
+          if (img.width && img.height) {
+            const ratio = img.width / img.height;
+            if (ratio > 1.25) {
+              // Gambar horizontal / landscape (misal logo teks memanjang)
+              newH = 50;
+              newW = Math.min(160, Math.round(50 * ratio));
+            } else if (ratio < 0.8) {
+              // Gambar vertikal
+              newW = 50;
+              newH = Math.min(120, Math.round(50 / ratio));
+            } else {
+              newW = 60;
+              newH = 60;
+            }
+          }
+          return {
+            ...prev,
+            logoType: 'custom',
+            customLogoUrl: processedUrl,
+            logoWidth: newW,
+            logoHeight: newH,
+          };
+        });
       };
       if (typeof event.target?.result === 'string') {
         img.src = event.target.result;
@@ -241,79 +262,210 @@ export const HeaderForm: React.FC<HeaderFormProps> = ({ header, onChange }) => {
           </div>
 
           {header.showLogo && (
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <button
-                type="button"
-                onClick={() => handleFieldChange('logoType', 'default')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer ${
-                  header.logoType === 'default'
-                    ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 text-amber-800 dark:text-amber-300'
-                    : 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100'
-                }`}
-              >
-                <div className="w-4 h-4 text-black flex items-center justify-center">
-                  <WindmillLogo size={16} />
+            <div className="space-y-3 pt-1">
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleFieldChange('logoType', 'default')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer ${
+                    header.logoType === 'default'
+                      ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 text-amber-800 dark:text-amber-300'
+                      : 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100'
+                  }`}
+                >
+                  <div className="w-4 h-4 text-black flex items-center justify-center">
+                    <WindmillLogo size={16} />
+                  </div>
+                  <span>Logo Kincir Angin (Holland)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleFieldChange('logoType', 'custom');
+                    if (!header.customLogoUrl) {
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer ${
+                    header.logoType === 'custom'
+                      ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 text-amber-800 dark:text-amber-300'
+                      : 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100'
+                  }`}
+                >
+                  <UploadIcon size={14} />
+                  <span>Upload Logo Sendiri</span>
+                </button>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+
+                {header.logoType === 'custom' && header.customLogoUrl && (
+                  <div className="flex items-center gap-2 ml-auto">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={header.customLogoUrl}
+                      alt="Custom Logo Preview"
+                      className="w-7 h-7 object-contain bg-white border border-zinc-300 rounded p-0.5"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                    >
+                      Ganti
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChange((prev) => ({
+                          ...prev,
+                          logoType: 'default',
+                          customLogoUrl: null,
+                        }));
+                      }}
+                      className="text-zinc-400 hover:text-rose-500 cursor-pointer p-0.5"
+                      title="Hapus Logo Kustom"
+                    >
+                      <TrashIcon size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Pengaturan Ukuran Logo (Width & Height) */}
+              <div className="pt-3 border-t border-zinc-200/80 dark:border-zinc-700/80 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                    Ukuran Logo (Width & Height)
+                  </span>
+                  <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
+                    {header.logoWidth ?? 60} × {header.logoHeight ?? 60} px
+                  </span>
                 </div>
-                <span>Logo Kincir Angin (Holland)</span>
-              </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  handleFieldChange('logoType', 'custom');
-                  if (!header.customLogoUrl) {
-                    fileInputRef.current?.click();
-                  }
-                }}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer ${
-                  header.logoType === 'custom'
-                    ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 text-amber-800 dark:text-amber-300'
-                    : 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100'
-                }`}
-              >
-                <UploadIcon size={14} />
-                <span>Upload Logo Sendiri</span>
-              </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Lebar (Width) */}
+                  <div className="bg-white dark:bg-zinc-800/80 p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700/70">
+                    <div className="flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-400 mb-1.5">
+                      <span className="font-medium">Lebar (Width)</span>
+                      <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
+                        {header.logoWidth ?? 60}px
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min="20"
+                        max="240"
+                        step="2"
+                        value={header.logoWidth ?? 60}
+                        onChange={(e) => handleFieldChange('logoWidth', Number(e.target.value))}
+                        className="flex-1 accent-amber-600 cursor-pointer"
+                      />
+                      <div className="relative w-16">
+                        <input
+                          type="number"
+                          min="10"
+                          max="300"
+                          value={header.logoWidth ?? 60}
+                          onChange={(e) =>
+                            handleFieldChange('logoWidth', Math.max(10, Math.min(300, Number(e.target.value) || 10)))
+                          }
+                          className="w-full px-1.5 py-1 text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-right pr-5 focus:outline-hidden focus:ring-1 focus:ring-amber-500 font-mono"
+                        />
+                        <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-zinc-400 pointer-events-none">
+                          px
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
+                  {/* Tinggi (Height) */}
+                  <div className="bg-white dark:bg-zinc-800/80 p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700/70">
+                    <div className="flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-400 mb-1.5">
+                      <span className="font-medium">Tinggi (Height)</span>
+                      <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
+                        {header.logoHeight ?? 60}px
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min="20"
+                        max="200"
+                        step="2"
+                        value={header.logoHeight ?? 60}
+                        onChange={(e) => handleFieldChange('logoHeight', Number(e.target.value))}
+                        className="flex-1 accent-amber-600 cursor-pointer"
+                      />
+                      <div className="relative w-16">
+                        <input
+                          type="number"
+                          min="10"
+                          max="300"
+                          value={header.logoHeight ?? 60}
+                          onChange={(e) =>
+                            handleFieldChange('logoHeight', Math.max(10, Math.min(300, Number(e.target.value) || 10)))
+                          }
+                          className="w-full px-1.5 py-1 text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-right pr-5 focus:outline-hidden focus:ring-1 focus:ring-amber-500 font-mono"
+                        />
+                        <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-zinc-400 pointer-events-none">
+                          px
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-              {header.logoType === 'custom' && header.customLogoUrl && (
-                <div className="flex items-center gap-2 ml-auto">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={header.customLogoUrl}
-                    alt="Custom Logo Preview"
-                    className="w-7 h-7 object-contain bg-white border border-zinc-300 rounded p-0.5"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
-                  >
-                    Ganti
-                  </button>
+                {/* Presets & Reset */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-[10px] text-zinc-400">Preset:</span>
+                    {[
+                      { label: 'Kecil (40×40)', w: 40, h: 40 },
+                      { label: 'Standar (60×60)', w: 60, h: 60 },
+                      { label: 'Besar (80×80)', w: 80, h: 80 },
+                      { label: 'Banner (120×50)', w: 120, h: 50 },
+                      { label: 'Lebar (160×60)', w: 160, h: 60 },
+                    ].map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => {
+                          onChange((prev) => ({
+                            ...prev,
+                            logoWidth: preset.w,
+                            logoHeight: preset.h,
+                          }));
+                        }}
+                        className="px-2 py-0.5 text-[10px] rounded-md bg-zinc-200/70 dark:bg-zinc-700/60 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 transition cursor-pointer font-medium"
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+
                   <button
                     type="button"
                     onClick={() => {
                       onChange((prev) => ({
                         ...prev,
-                        logoType: 'default',
-                        customLogoUrl: null,
+                        logoWidth: 60,
+                        logoHeight: 60,
                       }));
                     }}
-                    className="text-zinc-400 hover:text-rose-500 cursor-pointer p-0.5"
-                    title="Hapus Logo Kustom"
+                    className="text-[10px] text-amber-600 dark:text-amber-400 hover:underline cursor-pointer font-medium"
                   >
-                    <TrashIcon size={14} />
+                    Reset (60×60)
                   </button>
                 </div>
-              )}
+              </div>
             </div>
           )}
         </div>

@@ -106,13 +106,11 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
       {/* Kontainer Kertas Struk */}
       <div
         id="thermal-receipt"
-        className={`bg-white text-black p-4 sm:p-5 transition-all duration-300 font-mono select-text ${
-          is58mm ? 'paper-58mm' : 'paper-80mm'
-        } ${
-          is58mm
+        className={`bg-white text-black p-4 sm:p-5 transition-all duration-300 font-mono select-text ${is58mm ? 'paper-58mm' : 'paper-80mm'
+          } ${is58mm
             ? 'w-full max-w-[320px] text-[11px] leading-[1.3]'
             : 'w-full max-w-[420px] text-[12px] leading-[1.35]'
-        }`}
+          }`}
         style={{
           boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
         }}
@@ -125,11 +123,26 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({
               <img
                 src={header.customLogoUrl}
                 alt="Logo Toko"
-                className="max-h-16 max-w-[140px] object-contain filter grayscale contrast-200"
+                style={{
+                  width: `${header.logoWidth ?? 60}px`,
+                  height: `${header.logoHeight ?? 60}px`,
+                  maxWidth: '100%',
+                }}
+                className="object-contain filter grayscale contrast-200"
               />
             ) : (
-              <div className="w-16 h-16 flex items-center justify-center text-black">
-                <WindmillLogo size={58} />
+              <div
+                style={{
+                  width: `${header.logoWidth ?? 60}px`,
+                  height: `${header.logoHeight ?? 60}px`,
+                  maxWidth: '100%',
+                }}
+                className="flex items-center justify-center text-black"
+              >
+                <WindmillLogo
+                  width={header.logoWidth ?? 60}
+                  height={header.logoHeight ?? 60}
+                />
               </div>
             )}
           </div>

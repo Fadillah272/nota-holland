@@ -17,6 +17,8 @@ export interface ReceiptHeader {
   showLogo: boolean;
   logoType: 'default' | 'custom';
   customLogoUrl: string | null;
+  logoWidth?: number;
+  logoHeight?: number;
 }
 
 export type PaymentMethod = 'Tunai' | 'QRIS' | 'Debit' | 'Kredit' | 'Transfer';
